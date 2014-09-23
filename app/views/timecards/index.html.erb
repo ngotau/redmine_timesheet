@@ -1,0 +1,154 @@
+<% html_title l(:label_timesheet) %>
+<% content_for :header_tags do %>
+  <%= javascript_include_tag :time_sheet, :plugin => 'redmine_timesheet'  %>
+  <%= stylesheet_link_tag :time_sheet, :plugin => 'redmine_timesheet' %>
+<% end %>
+
+<!--SIDE BAR-->
+<% content_for :sidebar do %>
+	<div id="ts_side_bar">
+		<%= render :partial => 'sidebar' %>
+	</div>
+<% end %>
+<!--SIDE BAR END-->
+<!--CONTENT BEGIN-->
+<h2><%=l(:ts_time_card)%></h2>
+<input type = "hidden" id = "manager_mode" value = "<%=@manager_mode%>">
+<input type = "hidden" id = "this_date_id" value = "<%=@this_date_id%>">
+<input type = "hidden" id = "current_time" value = "<%=@current_time%>">
+<form id = "targetForm" method = "post" action="/timecards">
+<input type = "hidden" id = "y" name = "y" value = "<%=@this_year%>">
+<input type = "hidden" id = "m" name = "m" value = "<%=@this_month%>">
+<input type = "hidden" id = "d" name = "d" value = "<%=@this_day%>">
+<input type = "hidden" id = "u" name = "u" value = "<%=@this_uid%>">
+<%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+</form>
+<table width="100%" style="border:0px;border-collapse:collapse;">
+<tbody><tr><td>
+<div id="ts_page">
+    	<!--BEGIN ROW ToDay Word--> 
+    	<%
+    	today_status = (@this_work.work_status==1) ? l(:ts_status_on) : l(:ts_status_off) 
+    	%>
+        	<div class="ts_todaywordon">
+            	<div class="ts_iconcande"><%= image_tag "ts_cande.png", :plugin => "redmine_timesheet",:alt => "calendar" %></div>
+                <div class="ts_text_todayword">
+               		 <span class="ts_text_blue"><%=l(:ts_work)%>:</span> <span class="ts_text_orange" id ="this_work_status"> <%=today_status%></span>
+                </div>
+                <div class="ts_alert-box" id = "alert-box"><span class="ts_alert-box-title" id = "alert-box-title"></span>: <span id = "alert-box-message"></span></div>
+            </div>
+            <div class="ts_fulname">
+            	<div class="ts_avata"><%= avatar(@person, :size => "24", :height => 24, :width => 24) %></div>
+                <div class="ts_name"><%=@person.name%></div>
+            </div>
+        <!--END ROW ToDay Word--> 
+        <!--BEGIN ROW Date--> 
+        <div class="ts_rowdate">
+        	<div class="ts_lbl_date"><%=l(:ts_date)%>  : <span class="ts_date"><%=@this_date_str%></span></div>
+            <div class="ts_checkin">
+            	<div class="ts_input_checkin"><input name="work_in" id = "work_on" type="text"  placeholder="hh:mm" value = "<%=@this_work.work_in_time%>" onClick="make_default('work_on');"/></div>
+                <div class="ts_btn_checkin" id="checkIn">
+                	<div class="ts_iconcheckin"><%= image_tag "ts_checkin.png", :plugin => "redmine_timesheet" %></div>
+                    <div class="ts_text_checkin"><%=l(:ts_check_in)%></div>
+                </div>
+            </div>
+            <div class="ts_checkout">
+            	 <div class="ts_input_checkout"><input name="work_out" id = "work_off" type="text"  placeholder="hh:mm" value = "<%=@this_work.work_out_time%>" onClick="make_default('work_off');"/></div>	
+           		 <div class="ts_btn_checkout" id="checkOut">
+                	<div class="ts_iconcheckin"><%= image_tag "ts_checkout.png", :plugin => "redmine_timesheet" %></div>
+                    <div class="ts_text_checkin"><%=l(:ts_check_out)%></div>
+           		 </div>
+            </div> 
+            <div class="ts_break">
+            	 <div class="ts_select_break"><select name="work_break" id = "work_break" class = "ts_select_break">
+            	 	<option class="ts_select_break" value ="0.0">----</option>
+            	 	<% for index in 0 ... @break_time_names.size
+  						bt_name = @break_time_names[index]
+  						bt_value = @break_time_values[index]
+            	 	%>
+            	 	<option class="ts_select_break" value ="<%=bt_value%>"><%=bt_name%></option>
+            	 	<% end %> 
+            	 	</select></div>
+                 <div class="ts_btn_break" id="breakTime">	
+                     <div class="ts_iconbreak"><%= image_tag "ts_break.png", :plugin => "redmine_timesheet" %></div>
+                     <div class="ts_text_break"><%=l(:ts_break)%></div>
+                 </div>
+            </div>     
+        </div>
+        <!--END ROW Date--> 
+        <div class="clearfix"></div>
+        <!--BEGIN ROW This Month--> 
+        <div class="ts_thismonth">
+        	<div class="ts_text_thismonth"><%=l(:ts_month)%>: <span class="ts_text_sizebig"><%=@this_month_str%></span></div>
+            <div class="ts_tbl_thismonth">
+            	<div class="ts_tbl_row_header">
+                	<div class="ts_tbl_date"><span class="ts_bg_header"><%=l(:ts_date)%></span></div>
+                    <div class="ts_tbl_status"><span class="ts_bg_header"><%=l(:ts_status)%></span></div>
+                    <div class="ts_tbl_workingtime"><span class="ts_bg_header"><%=l(:ts_work_time)%></span></div>
+                    <div class="ts_tbl_lunch"><span class="ts_bg_header"><%=l(:ts_lunch)%></span></div>
+                    <div class="ts_tbl_break"><span class="ts_bg_header"><%=l(:ts_break)%></span></div>
+                    <div class="ts_tbl_time"><span class="ts_bg_header"><%=l(:ts_hours)%></span></div>
+                </div>
+ 			<% @month_sheet.each do |ms|
+ 				date = ms.work_date
+ 				year = date.year
+ 				day = date.day
+  				month = date.month
+  				wday = date.wday
+  				date_str = date.strftime("%Y/%m/%d")
+      			date_id = date.strftime("%Y%m%d") 
+      			status_str = (ms.work_status == 1) ? l(:ts_status_on) : l(:ts_status_off)
+      			row_css = "ts_bg_normal"
+      			if (ms.is_holiday) 
+      				row_css = "ts_bg_holiday"
+      			else
+      				if (wday == 0) 
+      					row_css = "ts_bg_sunday"
+      				else
+      					if (wday == 6) 
+      						row_css = "ts_bg_saturday"
+      					else 
+      						if (@this_date_str == date_str)
+      							row_css = "ts_bg_today"
+      						end
+      					end
+      				end
+      			end
+      			break_unit = ""
+      			hours_unit = ""
+      			if (ms.work_break != nil && ms.work_break > 0) 
+      				break_unit = "h"
+      			end
+      			if (ms.work_hours != nil && ms.work_hours > 0) 
+      				hours_unit = "h"
+      			end
+      			link_tag_open = ""
+      			link_tag_close = ""
+      			#if (@manager_mode == 1)
+      				link_tag_open = "<a href=\"#\" onclick=\"changeDate(#{year},#{month},#{day});\">"
+      				link_tag_close = "</a>"
+      			#end
+ 			%>
+                <div class="ts_tbl_row_normal" id = "<%=date_id%>">
+                	<div class="ts_tbl_date"><span class="<%=row_css%>"><%=raw link_tag_open %><%=date_str%>(<%= @wday_name[wday]%>)<%=raw link_tag_close%></span></div>
+                    <div class="ts_tbl_status"><div id ="<%=date_id%>_status" class="<%=row_css%>_<%=status_str%> <%=row_css%>"> </div></div>
+                    <div class="ts_tbl_workingtime"><div class="<%=row_css%>"><span id ="<%=date_id%>_in"><%=ms.work_in_time%></span> ~ <span id ="<%=date_id%>_out"><%=ms.work_out_time%></span></div></div>
+                    <div class="ts_tbl_lunch"><div class="<%=row_css%>"><span id ="<%=date_id%>_lunch"><%=ms.work_lunch%></span></div></div>
+                    <div class="ts_tbl_break"><div class="<%=row_css%>"><span id ="<%=date_id%>_break"><%=ms.work_break%></span> <%=break_unit%></div></div>
+                    <div class="ts_tbl_time"><div class="<%=row_css%>"><span id ="<%=date_id%>_hours"><%=ms.work_hours%></span> <%=hours_unit%></div></div>
+                </div>
+            <% end %> 
+            </div>
+            <div class="ts_tbl_total">
+                <div class="ts_total_last">
+                    <div class="ts_tbl_total_time"><div class="ts_bg_yel_total"><span id = "total_hours"><%=@total_hours%></span> h</div></div>
+                    <div class="ts_tbl_total_label"><span class="ts_bg_yel_total"><%=l(:ts_total_hours)%></span></div>
+                 </div>
+            </div>
+        </div>	
+        
+        <!--END ROW This Month--> 
+</div>
+</td></tr></tbody>
+</table>
+<!--END-->

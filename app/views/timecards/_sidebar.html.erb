@@ -1,0 +1,26 @@
+<h3><%= l(:ts_my_sheet) %></h3>
+<ul>
+	<li>
+		<%= link_to l(:ts_this_month),{:controller => "timecards",:u => @this_uid, :y => @today.year,:m => @today.month,:d => @today.day} %>
+	</li>
+	<li>
+		<%= link_to l(:ts_last_month),{:controller => "timecards",:u => @this_uid, :y => @last_month.year,:m => @last_month.month,:d => @last_month.day} %>
+	</li>
+</ul>
+<%if @manager_mode == 1 %>
+<h3><%= l(:ts_manager) %> | <%= l(:ts_user_time_sheet) %></h3>
+<table class="ts_manager_table">
+<tbody>
+	<% @people.each do |person| %>
+    <tr class="ts_manager_tr">
+        <td class="avatar">
+            <%= avatar(person, :size => "24", :height => 24, :width => 24) %>
+        </td>
+        <td class="name">
+            <span><%= link_to person.name, {:controller => "timecards",:u => person.id} %></span>
+        </td>
+    </tr> 
+	<% end %>
+</tbody>
+</table>
+<% end %>
