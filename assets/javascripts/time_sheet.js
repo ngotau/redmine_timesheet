@@ -29,7 +29,7 @@ $(document).ready(function(){
         	if (res!="OK"){
         	 alert_box("error",result);
         	}else {
-        		update_view("On",time,result);
+        		update_view("On",result);
         		if (manager_mode == "0") disable_check_in();
         	}
         },
@@ -54,7 +54,7 @@ $(document).ready(function(){
         	if (res!="OK"){
         	 alert_box("error",result);
         	}else {
-        		update_view("Off",time,result);
+        		update_view("Off",result);
         		if (manager_mode == "0") disable_check_out();
         	} 
         },
@@ -79,7 +79,7 @@ $(document).ready(function(){
         	if (res!="OK"){
         	 alert_box("error",result);
         	}else {
-        		update_view("Break",time,result);
+        		update_view("Break",result);
         	} 
         },
         beforeSend: function(){ $this.addClass('ajax-loading'); },
@@ -98,14 +98,15 @@ $(document).ready(function(){
 });
 
 //update date
-function update_view(type,time,result) {
+function update_view(type,result) {
 	$('#alert-box').hide();
 	//display result
 	var r1 = result.split(",");
-	work_status = r1[0] || "";
-	old_work_hours = r1[1] || 0;
-	new_work_hours = r1[2] || 0;
-	work_lunch = r1[3] || "";
+	time = r1[0] || "";
+	work_status = r1[1] || "";
+	old_work_hours = r1[2] || 0;
+	new_work_hours = r1[3] || 0;
+	work_lunch = r1[4] || "";
 	w_status = $('#this_date_id').val() + "_status";
 	w_in = $('#this_date_id').val() + "_in";
 	w_out = $('#this_date_id').val() + "_out";
@@ -119,11 +120,13 @@ function update_view(type,time,result) {
 	$('#total_hours').text(total_hours);
 	$('#this_work_status').text(work_status);
 	if (type == "On") {
+		$('#work_on').val(time);
 		$('#'+w_in).text(time);
 		change_col_status("On",w_status);
 		alert_box("success","Have a nice working day !");
 	}
 	if (type == "Off") {
+		$('#work_off').val(time);
 		$('#'+w_out).text(time); 
 		change_col_status("On",w_status);
 		alert_box("success","Thank you for your hard-working !");

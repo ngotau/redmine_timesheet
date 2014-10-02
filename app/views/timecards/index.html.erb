@@ -88,6 +88,7 @@
                     <div class="ts_tbl_lunch"><span class="ts_bg_header"><%=l(:ts_lunch)%></span></div>
                     <div class="ts_tbl_break"><span class="ts_bg_header"><%=l(:ts_break)%></span></div>
                     <div class="ts_tbl_time"><span class="ts_bg_header"><%=l(:ts_hours)%></span></div>
+                    <div class="ts_tbl_result"><span class="ts_bg_header"><%=l(:ts_work_result)%></span></div>
                 </div>
  			<% @month_sheet.each do |ms|
  				date = ms.work_date
@@ -136,13 +137,15 @@
                     <div class="ts_tbl_lunch"><div class="<%=row_css%>"><span id ="<%=date_id%>_lunch"><%=ms.work_lunch%></span></div></div>
                     <div class="ts_tbl_break"><div class="<%=row_css%>"><span id ="<%=date_id%>_break"><%=ms.work_break%></span> <%=break_unit%></div></div>
                     <div class="ts_tbl_time"><div class="<%=row_css%>"><span id ="<%=date_id%>_hours"><%=ms.work_hours%></span> <%=hours_unit%></div></div>
+                    <div class="ts_tbl_result"><div class="<%=row_css%>"><span id ="<%=date_id%>_hours"><%=ms.work_result%></span></div></div>
                 </div>
             <% end %> 
             </div>
             <div class="ts_tbl_total">
                 <div class="ts_total_last">
+                	<div class="ts_tbl_total_result"><div class="ts_bg_yel_total"><span id="total_result"><%=@total_result%></span> p</div></div>
                     <div class="ts_tbl_total_time"><div class="ts_bg_yel_total"><span id = "total_hours"><%=@total_hours%></span> h</div></div>
-                    <div class="ts_tbl_total_label"><span class="ts_bg_yel_total"><%=l(:ts_total_hours)%></span></div>
+                    <div class="ts_tbl_total_label"><span class="ts_bg_yel_total"><%=l(:ts_total)%></span></div>
                  </div>
             </div>
         </div>	

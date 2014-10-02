@@ -2,7 +2,40 @@ class TimecardsController < ApplicationController
   unloadable
   include TimecardsHelper
   
-  before_filter :find_person, :only => [:index,:show, :edit]
+  skip_before_filter :check_if_login_required, :only => [:result]
+  
+  before_filter :find_person, :only => [:index,:show]
+  
+  #show controller
+  def show
+    require_login || return
+    prepare_values
+    user_group = find_user_groups;
+    @manager_mode = 0
+    if (User.current.admin? || user_group.include?(l(:ts_label_director)) || user_group.include?(l(:ts_label_manager)) || user_group.include?(l(:ts_label_team_leader)))
+      @manager_mode = 1
+    end
+    @people = find_people(false)
+    @team_works = []
+    @total_days = 0
+    @total_hours = 0
+    @total_result = 0
+    @people.each do |member|
+      ts = Timecards.select("COUNT(work_date) as wdays, SUM(work_hours) as whours, SUM(work_result) as wresult ").
+           where("work_hours IS NOT NULL AND year(work_date)=#{@this_year} AND month(work_date)=#{@this_month}").
+           group(:users_id).having("users_id = #{member.id}").first
+      
+      if (ts == nil) 
+        m = Hash["name" => member.name, "workdays" => 0, "workhours" => 0.0, "workresult" => 0]
+      else
+        @total_days +=  ts.wdays
+        @total_hours += ts.whours.round(1)
+        @total_result += ts.wresult
+        m = Hash["name" => member.name, "workdays" => ts.wdays, "workhours" => ts.whours.round(1), "workresult" => ts.wresult]
+      end
+      @team_works << m
+    end
+  end
   
   #index controller
   def index
@@ -11,19 +44,26 @@ class TimecardsController < ApplicationController
     make_data
     
     user_group = find_user_groups;
-    logger.info user_group;
-    
     @manager_mode = 0
     if (User.current.admin? || user_group.include?(l(:ts_label_director)) || user_group.include?(l(:ts_label_manager)) || user_group.include?(l(:ts_label_team_leader)))
       @manager_mode = 1
-      logger.info "You are manager"
       @people = find_people
     end
   end
   
+  #update work_result
+  def result
+    today_str = Date.today.strftime("%Y/%m/%d")
+    @people = find_people(false)
+    @people.each do |member|
+      update_work_result(today_str,member.id)
+    end
+    render(:layout=>false)
+  end
+  
   #make data for views
   def make_data
-    @holidays = ['2014/09/02','2014/09/28']
+    @holidays = ['2014/09/02','2015/01/01']
     @wday_name = l(:ts_week_day_names).split(',')
     @month_names = l(:ts_month_names).split(',')
     @break_time_names = l(:ts_break_time_names).split(',')
@@ -31,6 +71,7 @@ class TimecardsController < ApplicationController
     #month data
     @month_sheet = []
     @total_hours = 0;
+    @total_result = 0;
     (@first_date..@last_date).each do |date|
       date_str = date.strftime("%Y/%m/%d")
       date_id = date.strftime("%Y%m%d")
@@ -48,44 +89,56 @@ class TimecardsController < ApplicationController
       if (date_sheet.work_hours != nil)
         @total_hours = @total_hours + date_sheet.work_hours
       end
+      if (date_sheet.work_result != nil)
+        @total_result = @total_result + date_sheet.work_result
+      end
     end
   end  
   #ajax method for auto insert work on
   def autocomplete_work_on
+    logger.info "yyyy"
     prepare_values
-    check_in_time = params[:it]
+    @check_in_time = params[:it]
+    
+    #set current time if nil
+    if (@check_in_time == "")
+       @check_in_time = @current_time 
+    end
     #validate before save
     validate_date(@this_date_str)
-    validate_work_in(check_in_time)
+    validate_work_in(@check_in_time)
     if (@error_message == nil)
       @old_hours = (@this_work.work_hours==nil) ? "" : @this_work.work_hours
-      check_in(check_in_time)
+      check_in(@check_in_time)
     end
     render(:layout=>false)
   end
   #ajax method for auto insert work off
   def autocomplete_work_off
     prepare_values
-    check_out_time = params[:ot]
+    @check_out_time = params[:ot]
+    if (@check_out_time =="")
+       @check_out_time = @current_time 
+     end
     #validate before save
     validate_date(@this_date_str)
-    validate_work_out(@this_work.work_in_time,check_out_time)
+    validate_work_out(@this_work.work_in_time,@check_out_time)
     if (@error_message == nil)
      @old_hours = (@this_work.work_hours==nil) ? "" : @this_work.work_hours
-      check_out(check_out_time)
+      check_out(@check_out_time)
     end
     render(:layout=>false)
   end
   #ajax method for auto update work break
   def autocomplete_work_break
     prepare_values
-    break_time = params[:bt]
+    @break_time = params[:bt]
     #validate before save
     validate_date(@this_date_str)
-    #validate_work_out(@this_work.work_in_time,check_out_time)
+    
     if (@error_message == nil)
       @old_hours = (@this_work.work_hours==nil) ? "" : @this_work.work_hours
-      break_time(break_time)
+      break_time(@break_time)
     end
     render(:layout=>false)
   end
@@ -145,18 +198,27 @@ class TimecardsController < ApplicationController
     
 private
   def prepare_values
+    @error_message = nil
     @today = Date.today
     @today_str = @today.strftime("%Y/%m/%d")
     @current_time =DateTime.now.strftime("%H:%M")
     @this_year = params.key?(:y) ? params[:y].to_i : @today.year
     @this_month = params.key?(:m) ? params[:m].to_i : @today.month
     @this_day = params.key?(:d) ? params[:d].to_i : @today.day
-    @this_date = Date.new(@this_year, @this_month, @this_day)
+    #check date parameter
+    if Date.valid_date?(@this_year, @this_month, @this_day)
+      @this_date = Date.new(@this_year, @this_month, @this_day)
+    else
+      @this_date = @today
+      @this_year = @today.year
+      @this_month = @today.month
+      @this_day = @today.day
+      @error_message = l(:ts_error_date_param)
+    end
     @last_month = @today << 1
     @this_month_str = sprintf("%04d/%02d", @this_year, @this_month)
     @first_date = Date.new(@this_year, @this_month, 1)
     @last_date = (@first_date >> 1) - 1
-    @error_message = nil
   
     @this_uid = params.key?(:u) ? params[:u].to_i : User.current.id
     @this_date_str = @this_date.strftime("%Y/%m/%d")
@@ -190,6 +252,7 @@ private
       @this_work.work_out = time
     end
     calculate_hours(@this_work)
+    @this_work.work_result = get_work_result(@this_work.work_date,@this_work.users_id)
     return @this_work.save
   end
   #break time

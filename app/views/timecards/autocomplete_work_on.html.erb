@@ -1,5 +1,5 @@
 <%
   status_str = (@this_work.work_status == 1) ? l(:ts_status_on) : l(:ts_status_off)
-  output_str = (@error_message != nil) ? "NG|#{@error_message}": "OK|#{status_str},#{@old_hours},#{@this_work.work_hours},#{@this_work.work_lunch}" 
+  output_str = (@error_message != nil) ? "NG|#{@error_message}": "OK|#{@check_in_time},#{status_str},#{@old_hours},#{@this_work.work_hours},#{@this_work.work_lunch}" 
 %>
 <%=output_str%>

@@ -12,6 +12,6 @@ Redmine::Plugin.register :redmine_timesheet do
   #  :visibility => ''
   #}
   
-  menu :top_menu, :timesheet, {:controller => 'timecards', :action => 'index', :project_id => nil}, :caption => :label_timesheet
+  menu :top_menu, :timesheet, "/timecards", :caption => :label_timesheet,:after =>:home
   #menu :admin_menu, :timesheet, {:controller => 'timesheet_settings', :action => 'index'}, :caption => :label_timesheet
 end

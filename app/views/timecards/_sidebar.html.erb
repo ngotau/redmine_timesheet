@@ -7,6 +7,16 @@
 		<%= link_to l(:ts_last_month),{:controller => "timecards",:u => @this_uid, :y => @last_month.year,:m => @last_month.month,:d => @last_month.day} %>
 	</li>
 </ul>
+<h3><%= l(:ts_team_time_sheet) %></h3>
+<ul>
+	<li>
+		<%= link_to l(:ts_this_month),{:controller => "timecards",:action => "show",:y => @today.year,:m => @today.month} %>
+	</li>
+	<li>
+		<%= link_to l(:ts_last_month),{:controller => "timecards",:action => "show", :y => @last_month.year,:m => @last_month.month} %>
+	</li>
+</ul>
+
 <%if @manager_mode == 1 %>
 <h3><%= l(:ts_manager) %> | <%= l(:ts_user_time_sheet) %></h3>
 <table class="ts_manager_table">

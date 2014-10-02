@@ -258,6 +258,12 @@ font-weight:bold;
 color:#006da5;	
 width:98%;
 }
+.ts_lb_thismonth
+{
+float:left;
+width:200px;
+}
+
 .ts_text_sizebig
 {
 font-size:20px;	
@@ -296,23 +302,28 @@ float:left;
 
 .ts_tbl_workingtime
 {
-width:28%;
+width:18%;
 float:left;		
 }
 .ts_tbl_lunch
 {
-width:14%;
+width:12%;
 float:left;	
 }
 .ts_tbl_break
 {
-width:14%;
+width:12%;
 float:left;	
 }
 .ts_tbl_time
 {
 width:15.9%;
 float:left;	
+}
+.ts_tbl_result
+{
+width:14%;
+float:left;		
 }
 .ts_bg_header
 {
@@ -411,7 +422,7 @@ margin-left:-1px;
 }
 .ts_tbl_total
 {
-width:29.9%;
+width:41.9%;
 float:right;
 color:#006da2;
 
@@ -419,15 +430,21 @@ color:#006da2;
 }
 .ts_tbl_total_label
 {
-width:46.6%;	
+width:28.5%;	
 float:right;
 
 }
 .ts_tbl_total_time
 {
 float:right;
-width:53.4%;	
+width:38%;	
 }
+.ts_tbl_total_result
+{
+float:right;
+width:33.5%;	
+}
+
 /*box*/
 .ts_alert-box {
 	float:left;
@@ -437,6 +454,15 @@ width:53.4%;
 	padding:8px 36px;
 	margin-left:20px;
 	display:none;
+}
+/*box*/
+.ts_alert-box-on{
+	float:left;
+	color:#555;
+	border-radius:10px;
+	font-family:Tahoma,Geneva,Arial,sans-serif;font-size:12px;
+	padding:8px 36px;
+	margin-left:20px;
 }
 .ts_alert-box-title {
 	font-weight:bold;
@@ -496,4 +522,71 @@ div#ts_side_bar li {
 	line-height: 1.5em;
 	padding-left: 5px;
 	padding-bottom:5px;
+}
+
+/* team css */
+.ts_team_summary
+{
+font-weight:bold;
+font-size:20px;	
+}
+.ts_team_month
+{
+float:left;
+margin-top:10px;	
+color:#47494b;
+width:700px;
+border-top:1px solid #949292;
+border-right:1px solid #949292;
+border-bottom:1px solid #949292;
+}
+.ts_team_header_row
+{
+width:100%;	
+float:left;
+height:40px;
+}
+
+.ts_team_name
+{
+width:249px;
+float:left;
+}
+.ts_team_workdays
+{
+width:150px;
+float:left;	
+}
+
+.ts_team_workhours
+{
+width:150px;
+float:left;		
+}
+
+.ts_team_workresult
+{
+width:150px;
+float:left;		
+}
+
+.ts_team_total_row
+{
+width:100%;	
+float:left;
+height:56px;
+}
+.ts_bg_total
+{
+color:#006da2;
+background-color:#fffabf;	
+border-left:1px solid #949292;
+border-top:1px solid #949292;
+border-bottom:1px solid #949292;
+line-height:56px;
+width:100%;
+height:56px;
+float:left;
+font-size:16px;
+text-align:center;
 }

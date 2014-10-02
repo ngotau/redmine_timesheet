@@ -1,1 +1,59 @@
-<h2>TimecardsController#show</h2>
+<% html_title l(:label_timesheet) %>
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag :time_sheet, :plugin => 'redmine_timesheet' %>
+<% end %>
+
+<!--SIDE BAR-->
+<% content_for :sidebar do %>
+	<div id="ts_side_bar">
+		<%= render :partial => 'sidebar' %>
+	</div>
+<% end %>
+<!--SIDE BAR END-->
+<!--CONTENT BEGIN-->
+<h2><%=l(:ts_time_card)%></h2>
+
+<table width="100%" style="border:0px;border-collapse:collapse;">
+<tbody><tr><td>
+<div id="ts_page">
+	<div class="ts_todaywordon">
+    	<div class="ts_iconcande"><%= image_tag "ts_cande.png", :plugin => "redmine_timesheet",:alt => "calendar" %></div>
+        <div class="ts_text_todayword">
+       		 <span class="ts_team_summary"><%=l(:ts_team_time_sheet)%></span>
+        </div>
+    </div>
+    <!--BEGIN ROW This Month--> 
+    <div class="ts_thismonth">
+    	<div class="ts_lb_thismonth"><%=l(:ts_month)%>: <span class="ts_text_sizebig"><%=@this_month_str%></span></div>
+    	<% if @error_message != nil %>
+        <div class="ts_alert-box-on warning" id = "alert-box"><span class="ts_alert-box-title" id = "alert-box-title"><%=l(:ts_warning)%></span>: <span id = "alert-box-message"><%=@error_message%></span></div>
+    	<%end %>
+    	<div class="clearfix"></div>
+        <div class="ts_team_month">
+        	<div class="ts_team_header_row">
+            	<div class="ts_team_name"><span class="ts_bg_header"><%=l(:ts_team_member)%></span></div>
+                <div class="ts_team_workdays"><span class="ts_bg_header"><%=l(:ts_worked_days)%></span></div>
+                <div class="ts_team_workhours"><span class="ts_bg_header"><%=l(:ts_worked_hours)%></span></div>
+                <div class="ts_team_workhours"><span class="ts_bg_header"><%=l(:ts_work_result)%></span></div>
+            </div>
+            <% @team_works.each do |tw| %>
+            <div class="ts_tbl_row_normal">
+            	<div class="ts_team_name"><span class="ts_bg_normal"><%=tw["name"]%></span></div>
+                <div class="ts_team_workdays"><span class="ts_bg_normal"><%=tw["workdays"]%></span></div>
+                <div class="ts_team_workhours"><span class="ts_bg_normal"><%=tw["workhours"]%></span></div>
+                <div class="ts_team_workresult"><span class="ts_bg_normal"><%=tw["workresult"]%></span></div>
+            </div>
+            <% end %>
+            <div class="ts_team_total_row">
+            	<div class="ts_team_name"><span class="ts_bg_total"><%=l(:ts_total)%></span></div>
+                <div class="ts_team_workdays"><span class="ts_bg_total"><%=@total_days%></span></div>
+                <div class="ts_team_workhours"><span class="ts_bg_total"><%=@total_hours%></span></div>
+                <div class="ts_team_workresult"><span class="ts_bg_total"><%=@total_result%></span></div>
+            </div>
+        </div>
+    </div>	
+    <!--END ROW This Month--> 
+</div>
+</td></tr></tbody>
+</table>
+<!--END-->
