@@ -1,9 +1,7 @@
 <% html_title l(:label_timesheet) %>
 <% content_for :header_tags do %>
-  <%= javascript_include_tag :time_sheet, :plugin => 'redmine_timesheet'  %>
-  <%= stylesheet_link_tag :time_sheet, :plugin => 'redmine_timesheet' %>
+  <%= stylesheet_link_tag :timesheet_width, :plugin => 'redmine_timesheet' %>
 <% end %>
-
 <!--SIDE BAR-->
 <% content_for :sidebar do %>
 	<div id="ts_side_bar">
@@ -44,7 +42,7 @@
         <!--END ROW ToDay Word--> 
         <!--BEGIN ROW Date--> 
         <div class="ts_rowdate">
-        	<div class="ts_lbl_date"><%=l(:ts_date)%>  : <span class="ts_date"><%=@this_date_str%></span></div>
+        	<div class="ts_lbl_date"><span class="ts_date"><%=@this_date_str%></span></div>
             <div class="ts_checkin">
             	<div class="ts_input_checkin"><input name="work_in" id = "work_on" type="text"  placeholder="hh:mm" value = "<%=@this_work.work_in_time%>" onClick="make_default('work_on');"/></div>
                 <div class="ts_btn_checkin" id="checkIn">

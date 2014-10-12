@@ -4,14 +4,7 @@
 
 $(document).ready(function(){
  var manager_mode = $('#manager_mode').val();
- if ($('#work_on').val() == "") {
- 	$("#work_on").focus();
- 	alert_box("warning","Please check-in when you come office ");
- }
- else if ($('#work_off').val() == "") {
- 	$("#work_off").focus();
- 	alert_box("notice","Please check-out when you leave office ");
- }
+ var simple_mode = $('#simple_mode').val();
  
  //check in
  if($('#checkIn').length){
@@ -29,7 +22,8 @@ $(document).ready(function(){
         	if (res!="OK"){
         	 alert_box("error",result);
         	}else {
-        		update_view("On",result);
+        		if (simple_mode == "1") update_simple_view("On",result);
+        		else update_view("On",result);
         		if (manager_mode == "0") disable_check_in();
         	}
         },
@@ -54,7 +48,8 @@ $(document).ready(function(){
         	if (res!="OK"){
         	 alert_box("error",result);
         	}else {
-        		update_view("Off",result);
+        		if (simple_mode == "1") update_simple_view("Off",result);
+        		else update_view("Off",result);
         		if (manager_mode == "0") disable_check_out();
         	} 
         },
@@ -88,6 +83,19 @@ $(document).ready(function(){
    });
  }
  
+ //check if time is input
+ $(document).ready(function(){
+	 if ($('#work_on').val() == "") {
+	 	$("#work_on").focus();
+	 	disable_check_out();
+	 	alert_box("warning","Please check-in when you come office ");
+	 }
+	 else if ($('#work_off').val() == "") {
+	 	$("#work_off").focus();
+	 	alert_box("notice","Please check-out when you leave office ");
+	 }
+ })
+ 
  //check if not manager
  if (manager_mode=="0" && $('#work_on').val() != "") {
  	disable_check_in();
@@ -97,6 +105,20 @@ $(document).ready(function(){
  }
 });
 
+function update_simple_view(type,result){
+	$('#alert-box').hide();
+	//display result
+	var r1 = result.split(",");
+	time = r1[0] || "";
+	if (type == "On") {
+		$('#work_on').val(time);
+		alert_box("success","Have a nice working day !");
+	}
+	if (type == "Off") {
+		$('#work_off').val(time);
+		alert_box("success","Thank you for your hard-working !");
+	}
+}
 //update date
 function update_view(type,result) {
 	$('#alert-box').hide();

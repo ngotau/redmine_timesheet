@@ -1,0 +1,50 @@
+<%
+@today = Date.today
+@current_time =DateTime.now.strftime("%H:%M")
+@this_uid = User.current.id
+@this_date_str = @today.strftime("%Y/%m/%d")
+@this_work = Timecards.where(["work_date = ? AND users_id = ?", @this_date_str, @this_uid]).first
+if (@this_work == nil)
+   @this_work = Timecards.new
+   @this_work.users_id = @this_uid
+   @this_work.work_date = @this_date_str
+end
+@this_work.work_in_time = @this_work.work_in.present? ? @this_work.work_in.strftime("%H:%M") : ""
+@this_work.work_out_time = @this_work.work_out.present? ? @this_work.work_out.strftime("%H:%M") : ""
+@this_year = @today.year
+@this_month = @today.month
+@this_day = @today.day
+%>
+<input type = "hidden" id = "manager_mode" value = "0">
+<input type = "hidden" id = "simple_mode" value = "1">
+<input type = "hidden" id = "current_time" value = "<%=@current_time%>">
+<form id = "targetForm" method = "post" action="/timecards">
+<input type = "hidden" id = "y" name = "y" value = "<%=@this_year%>">
+<input type = "hidden" id = "m" name = "m" value = "<%=@this_month%>">
+<input type = "hidden" id = "d" name = "d" value = "<%=@this_day%>">
+<input type = "hidden" id = "u" name = "u" value = "<%=@this_uid%>">
+<%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+</form>
+
+<div id = "welcome">
+  
+  <div class="ts_title"><%=l(:ts_time_card)%></div>
+  <div class="ts_alert-box" id = "alert-box"><span class="ts_alert-box-title" id = "alert-box-title"></span>: <span id = "alert-box-message"></span></div>
+  <div class="ts_lbl_date"><%=l(:ts_date)%>  : <span class="ts_date"><%=@this_date_str%></span></div>
+  <div class="ts_rowdate">
+	<div class="ts_checkin">
+		<div class="ts_input_checkin"><input name="work_in" id = "work_on" type="text"  placeholder="hh:mm" value = "<%=@this_work.work_in_time%>" onClick="make_default('work_on');"/></div>
+	    <div class="ts_btn_checkin" id="checkIn">
+	    	<div class="ts_iconcheckin"><%= image_tag "ts_checkin.png", :plugin => "redmine_timesheet" %></div>
+	        <div class="ts_text_checkin"><%=l(:ts_check_in)%></div>
+	    </div>
+	</div>
+	<div class="ts_checkout">
+    	 <div class="ts_input_checkout"><input name="work_out" id = "work_off" type="text"  placeholder="hh:mm" value = "<%=@this_work.work_out_time%>" onClick="make_default('work_off');"/></div>	
+   		 <div class="ts_btn_checkout" id="checkOut">
+        	<div class="ts_iconcheckin"><%= image_tag "ts_checkout.png", :plugin => "redmine_timesheet" %></div>
+            <div class="ts_text_checkin"><%=l(:ts_check_out)%></div>
+   		 </div>
+    </div> 
+ </div>
+</div>

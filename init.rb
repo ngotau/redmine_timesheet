@@ -1,3 +1,5 @@
+require 'redmine_timesheet'
+
 Redmine::Plugin.register :redmine_timesheet do
   name 'Redmine Timesheet plugin'
   author 'GMO RUNSYSTEM'
@@ -13,5 +15,5 @@ Redmine::Plugin.register :redmine_timesheet do
   #}
   
   menu :top_menu, :timesheet, "/timecards", :caption => :label_timesheet,:after =>:home
-  #menu :admin_menu, :timesheet, {:controller => 'timesheet_settings', :action => 'index'}, :caption => :label_timesheet
+  
 end

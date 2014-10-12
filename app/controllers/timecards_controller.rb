@@ -42,7 +42,7 @@ class TimecardsController < ApplicationController
     require_login || return
     prepare_values
     make_data
-    
+    #
     user_group = find_user_groups;
     @manager_mode = 0
     if (User.current.admin? || user_group.include?(l(:ts_label_director)) || user_group.include?(l(:ts_label_manager)) || user_group.include?(l(:ts_label_team_leader)))
