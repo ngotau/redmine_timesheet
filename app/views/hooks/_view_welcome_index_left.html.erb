@@ -35,14 +35,14 @@ end
 	<div class="ts_checkin">
 		<div class="ts_input_checkin"><input name="work_in" id = "work_on" type="text"  placeholder="hh:mm" value = "<%=@this_work.work_in_time%>" onClick="make_default('work_on');"/></div>
 	    <div class="ts_btn_checkin" id="checkIn">
-	    	<div class="ts_iconcheckin"><%= image_tag "ts_checkin.png", :plugin => "redmine_timesheet" %></div>
+	    	<div class="ts_iconcheckin"><%= image_tag "ts_checkin_s.png", :plugin => "redmine_timesheet" %></div>
 	        <div class="ts_text_checkin"><%=l(:ts_check_in)%></div>
 	    </div>
 	</div>
 	<div class="ts_checkout">
     	 <div class="ts_input_checkout"><input name="work_out" id = "work_off" type="text"  placeholder="hh:mm" value = "<%=@this_work.work_out_time%>" onClick="make_default('work_off');"/></div>	
    		 <div class="ts_btn_checkout" id="checkOut">
-        	<div class="ts_iconcheckin"><%= image_tag "ts_checkout.png", :plugin => "redmine_timesheet" %></div>
+        	<div class="ts_iconcheckin"><%= image_tag "ts_checkout_s.png", :plugin => "redmine_timesheet" %></div>
             <div class="ts_text_checkin"><%=l(:ts_check_out)%></div>
    		 </div>
     </div> 
