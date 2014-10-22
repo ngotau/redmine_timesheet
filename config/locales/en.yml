@@ -34,6 +34,7 @@ en:
   ts_error_date: "Date entered is wrong format"
   ts_error_work_out_time: "Check-out time should be later than check-in time"
   ts_error_date_param: "Date parameter is wrong. The date was set as today!"
+  ts_error_not_authorize: "You are not authorized to edit !"
   ts_db_error: "Database process error"
   ts_my_sheet: "My Time-Cards"
   ts_this_month: "This month"

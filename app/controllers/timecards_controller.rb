@@ -5,16 +5,14 @@ class TimecardsController < ApplicationController
   skip_before_filter :check_if_login_required, :only => [:result]
   
   before_filter :find_person, :only => [:index,:show]
-  
+ 
   #show controller
   def show
     require_login || return
     prepare_values
-    user_group = find_user_groups;
-    @manager_mode = 0
-    if (User.current.admin? || user_group.include?(l(:ts_label_director)) || user_group.include?(l(:ts_label_manager)) || user_group.include?(l(:ts_label_team_leader)))
-      @manager_mode = 1
-    end
+    #user_group = find_user_groups;
+    #if (User.current.admin? || user_group.include?(l(:ts_label_director)) || user_group.include?(l(:ts_label_manager)) || user_group.include?(l(:ts_label_team_leader)))
+    
     @people = find_people(false)
     @team_works = []
     @total_days = 0
@@ -42,13 +40,9 @@ class TimecardsController < ApplicationController
     require_login || return
     prepare_values
     make_data
-    #
-    user_group = find_user_groups;
-    @manager_mode = 0
-    if (User.current.admin? || user_group.include?(l(:ts_label_director)) || user_group.include?(l(:ts_label_manager)) || user_group.include?(l(:ts_label_team_leader)))
-      @manager_mode = 1
-      @people = find_people
-    end
+    
+    @people = find_people
+    
   end
   
   #update work_result
@@ -96,7 +90,6 @@ class TimecardsController < ApplicationController
   end  
   #ajax method for auto insert work on
   def autocomplete_work_on
-    logger.info "yyyy"
     prepare_values
     @check_in_time = params[:it]
     
@@ -104,12 +97,18 @@ class TimecardsController < ApplicationController
     if (@check_in_time == "")
        @check_in_time = @current_time 
     end
-    #validate before save
-    validate_date(@this_date_str)
-    validate_work_in(@check_in_time)
-    if (@error_message == nil)
-      @old_hours = (@this_work.work_hours==nil) ? "" : @this_work.work_hours
-      check_in(@check_in_time)
+    #check if time is edit
+    @edit_authorize = 0 if (@this_work.work_in !=nil) 
+    if (@manager_mode == 1 || @edit_authorize == 1)
+      #validate before save
+      validate_date(@this_date_str)
+      validate_work_in(@check_in_time)
+      if (@error_message == nil)
+        @old_hours = (@this_work.work_hours==nil) ? "" : @this_work.work_hours
+        check_in(@check_in_time)
+      end
+    else
+      @error_message = l(:ts_error_not_authorize) 
     end
     render(:layout=>false)
   end
@@ -119,13 +118,19 @@ class TimecardsController < ApplicationController
     @check_out_time = params[:ot]
     if (@check_out_time =="")
        @check_out_time = @current_time 
-     end
-    #validate before save
-    validate_date(@this_date_str)
-    validate_work_out(@this_work.work_in_time,@check_out_time)
-    if (@error_message == nil)
-     @old_hours = (@this_work.work_hours==nil) ? "" : @this_work.work_hours
-      check_out(@check_out_time)
+    end
+    #check if time is edit
+    @edit_authorize = 0 if (@this_work.work_out !=nil) 
+    if (@manager_mode == 1 || @edit_authorize == 1)
+      #validate before save
+      validate_date(@this_date_str)
+      validate_work_out(@this_work.work_in_time,@check_out_time)
+      if (@error_message == nil)
+       @old_hours = (@this_work.work_hours==nil) ? "" : @this_work.work_hours
+        check_out(@check_out_time)
+      end
+    else
+       @error_message = l(:ts_error_not_authorize) 
     end
     render(:layout=>false)
   end
@@ -172,6 +177,7 @@ class TimecardsController < ApplicationController
     
     @status = params[:status] || 1
     scope = Person.logged.status(@status)
+    scope = scope.staff
     scope = scope.seach_by_name(params[:name]) if params[:name].present?
     if (allow_group != nil)
       scope = scope.in_group(allow_group.id) 
@@ -228,6 +234,11 @@ private
       @this_work = Timecards.new
       @this_work.users_id = @this_uid
       @this_work.work_date = @this_date_str
+    end
+    @edit_authorize = (User.current.id == @this_uid) ? 1: 0
+    @manager_mode = 0
+    if User.current.allowed_people_to?(:edit_timesheet, @person)
+      @manager_mode = 1
     end
     format_time_card(@this_work)
   end
@@ -307,6 +318,22 @@ private
       #nothing
     else
       @error_message =  l(:ts_error_date)
+    end
+  end
+  
+  private
+  def authorize_people
+    allowed = case params[:action].to_s
+      when "index", "show"
+        User.current.allowed_people_to?(:edit_timesheet, @person)
+      else
+        false
+      end
+
+    if allowed
+      true
+    else
+      deny_access
     end
   end
 end

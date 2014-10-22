@@ -5,6 +5,7 @@
 $(document).ready(function(){
  var manager_mode = $('#manager_mode').val();
  var simple_mode = $('#simple_mode').val();
+ var edit_authorize = $('#edit_authorize').val();
  
  //check in
  if($('#checkIn').length){
@@ -85,6 +86,10 @@ $(document).ready(function(){
  
  //check if time is input
  $(document).ready(function(){
+ 	if ((manager_mode == "0") && (edit_authorize == "0")){
+ 		disable_check_in();
+ 		disable_check_out();	
+ 	}else {
 	 if ($('#work_on').val() == "") {
 	 	$("#work_on").focus();
 	 	disable_check_out();
@@ -94,6 +99,7 @@ $(document).ready(function(){
 	 	$("#work_off").focus();
 	 	alert_box("notice","Please check-out when you leave office ");
 	 }
+	}
  })
  
  //check if not manager
